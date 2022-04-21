@@ -1,6 +1,7 @@
 package sample;
 
 import java.awt.Color;
+
 import java.awt.Component;
 import java.awt.DisplayMode;
 import java.awt.Font;
@@ -9,10 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.Expression;
 import java.sql.ClientInfoStatus;
+import java.text.ParseException;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-
+import javax.script.ScriptException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -42,12 +44,13 @@ public class Calc implements ActionListener {
 	JButton DivitionButton;
 	JButton EqualtoButton;
 	
-	StoreValue val;
+	String opretor = "";
+	String firstNumber = "";
+	String lastNumber = "";
 	
 	String lastChar;
-	
+	int result;
 	public Calc() {
-		val = new StoreValue();
 		jf = new JFrame("Calc");
 		jf.setLayout(null);
 		jf.setSize(500,500);
@@ -180,11 +183,25 @@ public class Calc implements ActionListener {
 		new Calc();
 	}
 	
-	public Boolean checkCharacter() {
-		if(lastChar == "+" || lastChar == "-" || lastChar == "x" || lastChar == "/" || lastChar == "."|| lastChar == ",") {
+	public boolean checkCharacter() {
+		String last = DisplayLabal.getText().substring(DisplayLabal.getText().length() - 1);
+		if (last == "+" || last == "-"|| last == "*"|| last == "/"|| last == "."|| last == ",") {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	public void addOpretor (String Opret)
+	{
+		if(firstNumber != "") {
+			opretor = Opret;
+		}
+	}
+	public void addNumber(String num) {
+		if (opretor == "") {
+			firstNumber += num;
+		} else {
+			lastNumber += num;
 		}
 	}
 	
@@ -192,148 +209,104 @@ public class Calc implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == SevenButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "7");
-			val.addData("7");
+			addNumber("7");
 		} else if (e.getSource() == EightButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "8");
-			val.addData("8");
+			addNumber("8");
 		} else if (e.getSource() == NineButton){
 			DisplayLabal.setText(DisplayLabal.getText() + "9");
-			val.addData("9");
+			addNumber("9");
 		} else if (e.getSource() == FourButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "4");
-			val.addData("4");
+			addNumber("4");
 		} else if (e.getSource() == FiveButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "5");
-			val.addData("5");
+			addNumber("5");
 		} else if (e.getSource() == SixButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "6");
-			val.addData("6");
+			addNumber("6");
 		} else if (e.getSource() == ThreeButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "3");
-			val.addData("3");
+			addNumber("3");
 		} else if (e.getSource() == TowButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "2");
-			val.addData("2");
+			addNumber("2");
 		} else if (e.getSource() == OneButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "1");
-			val.addData("1");
+			addNumber("1");
 		} else if (e.getSource() == ZeroButton) {
 			DisplayLabal.setText(DisplayLabal.getText() + "0");
-			val.addData("0");
+			addNumber("0");
 		} else if (e.getSource() == DotButton) {
 			if(DisplayLabal.getText() == "" || checkCharacter()) {
 				return;
 			}
 			DisplayLabal.setText(DisplayLabal.getText() + ".");
-			val.addData(".");
+			addOpretor(".");
 		} else if (e.getSource() == ClearButton) {
-			val.clear();
 			DisplayLabal.setText("");
+			firstNumber = "";
+			lastNumber = "";
+			opretor = "";
 		} else if (e.getSource() == AdditionButton) {
 			if(DisplayLabal.getText() == "" || checkCharacter()) {
 				return;
 			}
 			DisplayLabal.setText(DisplayLabal.getText() + "+");
-			val.addData("+");
+			addOpretor("+");
 		} else if (e.getSource() == ComaButton) {
 			if(DisplayLabal.getText() == "" || checkCharacter()) {
 				return;
 			}
 			DisplayLabal.setText(DisplayLabal.getText() + ",");
+			addOpretor(",");
 			if(DisplayLabal.getText() == "" || checkCharacter()) {
 				return;
 			}
-			val.addData(",");
 		} else if (e.getSource() == SubtractionButton) {
 			if(DisplayLabal.getText() == "" || checkCharacter()) {
 				return;
 			}
 			DisplayLabal.setText(DisplayLabal.getText() + "-");
-			val.addData("-");
+			addOpretor("-");
 		} else if (e.getSource() == MultyplicationButton) {
 			if(DisplayLabal.getText() == "" || checkCharacter()) {
 				return;
 			}
 			DisplayLabal.setText(DisplayLabal.getText() + "x");
-			val.addData("*");
+			addOpretor("x");
 		}  else if (e.getSource() == DivitionButton) {
 			if(DisplayLabal.getText() == "" || checkCharacter()) {
 				return;
 			}
 			DisplayLabal.setText(DisplayLabal.getText() + "/");
-			val.addData("/");
+			addOpretor("/");
 		} else if (e.getSource() == EqualtoButton) {
-			val.show();
-		}
-	}
-	
-	
-	private class StoreValue {
-		class Data{
-			String data;
-			Data next;
-			Data prev;
-			
-			Data(String value) {
-				this.data = value;
+			if (firstNumber == "" && lastNumber == "" && opretor == "") {
+				return;
 			}
-		}
-		
-		private Data head = null;
-		private Data tail = null;
-		
-		Boolean contains(String data) {
-			if(data == "+" || data == "-" || data == "*" || data == "/") {
-				return true;
+			switch (opretor) {
+			case "+":
+				result = Integer.parseInt(firstNumber) + Integer.parseInt(lastNumber);
+				break;
+			case "-":
+				result = Integer.parseInt(firstNumber) - Integer.parseInt(lastNumber);
+				DisplayLabal.setText(result + "");
+				break;
+			case "x":
+				result = Integer.parseInt(firstNumber) * Integer.parseInt(lastNumber);
+				break;
+			case "/":
+				result = Integer.parseInt(firstNumber) / Integer.parseInt(lastNumber);
+				break;
+			default:
+				break;
 			}
-			return false;
-		}
-		public void addData(String data) {
-			lastChar = data;
-			// checking: is 'data' an opretor
-			if (contains(data)) {
-				
-				if (head == null) {
-					return;
-				} else {
-					if (contains(this.tail.data)) {
-						return;
-					}
-					Data newData = new Data(data);
-					this.tail.next = newData;
-					newData.prev = this.tail;
-					this.tail = newData;
-					return;
-				}
-				
-			} else {
-				Data newData = new Data(data);
-				if(head == null) {
-					this.head = newData;
-				} else {
-					if (contains(this.tail.data)) {
-						this.tail.next = newData;
-						newData.prev = this.tail;
-						this.tail = newData;
-						return;
-					}
-					 this.tail.data += data;
-					 return;
-				}
-				this.tail = newData;
-			}
-			return;
-		}
-		public void show() {
-			Data temp = this.head;
-			while(temp != null) {
-				System.out.println(temp.data);
-				temp = temp.next;
-			}
-		}
-		private void clear() {
-			this.head = null;
-			this.tail = null;
+			DisplayLabal.setText(result + "");
+			firstNumber = "";
+			firstNumber += result;
+			lastNumber = "";
+			opretor = "";
 		}
 	}
 }
